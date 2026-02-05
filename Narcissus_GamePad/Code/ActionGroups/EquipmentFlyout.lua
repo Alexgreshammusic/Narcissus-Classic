@@ -103,7 +103,7 @@ end
 function ag:KeyDown(key)
     if key == "PAD1" then
         if self.currentObj then
-            return nil, false;
+            return nil, true;
         end
     elseif key == "PAD2" then
         self.frame:Hide();
