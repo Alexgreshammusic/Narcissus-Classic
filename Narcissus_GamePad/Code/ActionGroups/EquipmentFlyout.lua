@@ -6,6 +6,7 @@ ag.repeatInterval = 0.25;
 
 local BUTTONS_PER_ROW = 5;
 local SlotBorder = NarciGamePadOverlay.SlotBorder;
+local EquipmentManagerAPI = NarciClassicAPI.EquipmentManager;
 
 function ag:Init()
     self.frame = Narci_EquipmentFlyoutFrame;
@@ -84,7 +85,12 @@ function ag:Enter(currentObj)
     if currentObj and currentObj.OnEnter then
         SlotBorder:AnchorToSlotButton(currentObj);
         currentObj:OnEnter(nil, true);
-        addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
+        local _, _, bags, _, slot, bag = EquipmentManagerAPI.UnpackLocation(currentObj.location);
+        if bags then
+            addon.ClickProxy:SetUseBagItem(bag, slot, "PAD1");
+        else
+            addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
+        end
     end
     self.currentObj = currentObj;
 end
