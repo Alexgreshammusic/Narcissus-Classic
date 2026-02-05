@@ -101,10 +101,16 @@ function ag:Enter(currentObj)
         if currentObj.location then
             local player, bank, bags, voidStorage, slot, bag = EquipmentManagerAPI.UnpackLocation(currentObj.location);
             NarciDebugEquip("UnpackLocation", "player", player, "bank", bank, "bags", bags, "void", voidStorage, "bag", bag, "slot", slot);
+            if bags and bag ~= nil and slot ~= nil then
+                NarciDebugEquip("Bind PAD1 UseBagItem", "bag", bag, "slot", slot);
+                addon.ClickProxy:SetUseBagItem(bag, slot, "PAD1");
+            else
+                addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
+            end
         else
             NarciDebugEquip("UnpackLocation skipped: missing location");
+            addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
         end
-        addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
     end
     self.currentObj = currentObj;
 end
