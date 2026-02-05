@@ -59,23 +59,70 @@ local Proxy = CreateFrame("Button", "NarciPadClickProxy", nil, "SecureActionButt
 addon.ClickProxy = Proxy;
 Proxy:SetAttribute("type", "click");
 
+local function GetConsolePortInput()
+    if not ConsolePort or not ConsolePort.DB then
+        return
+    end
+    local ok, db = pcall(ConsolePort.DB, ConsolePort);
+    if not ok or not db then
+        return
+    end
+    local input = db.Input;
+    if input then
+        return input
+    end
+    local okValue, value = pcall(function()
+        return db("Input");
+    end);
+    if okValue then
+        return value
+    end
+end
+
+function Proxy:BindConsolePortButton(key, object)
+    local input = GetConsolePortInput();
+    if not input or not input.SetButton then
+        return false
+    end
+    input:SetButton(key, self, object, true, "LeftButton");
+    return true
+end
+
+function Proxy:BindConsolePortMacro(key, macroText)
+    local input = GetConsolePortInput();
+    if not input or not input.SetMacro then
+        return false
+    end
+    input:SetMacro(key, self, macroText, true, "LeftButton");
+    return true
+end
+
 function Proxy:SetClickTarget(object, key)
     key = key or "PAD3";
+    if self:BindConsolePortButton(key, object) then
+        return
+    end
     SetOverrideBindingClick(Proxy, true, key, "NarciPadClickProxy");
     self:SetAttribute("type", "click");
     self:SetAttribute("clickbutton", object);
 end
 
 function Proxy:SetUseItem(slotID)
+    if self:BindConsolePortMacro("PAD3", string.format("/use %s", slotID)) then
+        return
+    end
     SetOverrideBindingClick(Proxy, true, "PAD3", "NarciPadClickProxy");
-	self:SetAttribute("type", "item");
-	self:SetAttribute("item", slotID);
+    self:SetAttribute("type", "item");
+    self:SetAttribute("item", slotID);
 end
 
 function Proxy:SetUseBagItem(bag, slot, key)
     key = key or "PAD1";
     if not bag or not slot then
         self:Remove();
+        return
+    end
+    if self:BindConsolePortMacro(key, string.format("/use %d %d", bag, slot)) then
         return
     end
     SetOverrideBindingClick(Proxy, true, key, "NarciPadClickProxy");
@@ -89,6 +136,9 @@ function Proxy:SetUseItemID(itemID, key)
         self:Remove();
         return
     end
+    if self:BindConsolePortMacro(key, string.format("/use item:%d", itemID)) then
+        return
+    end
     SetOverrideBindingClick(Proxy, true, key, "NarciPadClickProxy");
     self:SetAttribute("type", "item");
     self:SetAttribute("item", string.format("item:%d", itemID));
@@ -96,6 +146,9 @@ end
 
 function Proxy:SetRunMacro(macroText)
     if macroText then
+        if self:BindConsolePortMacro("PAD3", macroText) then
+            return
+        end
         SetOverrideBindingClick(Proxy, true, "PAD3", "NarciPadClickProxy");
         self:SetAttribute("type", "macro");
         self:SetAttribute("macrotext", macroText);
@@ -106,6 +159,10 @@ end
 
 function Proxy:SetCancelCast()
     ClearOverrideBindings(self)
+    local input = GetConsolePortInput();
+    if input and input.Release then
+        input:Release(self);
+    end
     SetOverrideBindingClick(Proxy, true, "PAD2", "NarciPadClickProxy");
     self:SetAttribute("type", "macro");
     self:SetAttribute("macrotext", "/stopcasting");
@@ -113,6 +170,10 @@ end
 
 function Proxy:Remove()
     ClearOverrideBindings(self)
+    local input = GetConsolePortInput();
+    if input and input.Release then
+        input:Release(self);
+    end
 end
 
 
