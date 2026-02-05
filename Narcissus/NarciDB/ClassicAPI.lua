@@ -77,6 +77,12 @@ local EQUIP_ITEM = 1;
 local UNEQUIP_ITEM = 2;
 local SWAP_ITEM = 3;
 
+local function DebugEquip(...)
+	if _G.NarciDebugEquip then
+		_G.NarciDebugEquip(...);
+	end
+end
+
 local function EquipmentManager_UnpackLocation(location)	--Copied from Retail
 	if ( location < 0 ) then
 		return false, false, false, 0;
@@ -130,6 +136,7 @@ local function EquipmentManager_EquipItemByLocation (location, invSlot)
 	action.bags = bags;
 	action.slot = slot;
 	action.bag = bag;
+	DebugEquip("EquipAction", "type", action.type, "invSlot", action.invSlot, "bags", action.bags, "bag", action.bag, "slot", action.slot, "player", action.player, "bank", action.bank);
 
 	return action;
 end
@@ -149,14 +156,18 @@ end
 
 local function EquipmentManager_EquipContainerItem (action)
 	ClearCursor();
+	DebugEquip("EquipContainerItem", "bag", action.bag, "slot", action.slot, "invSlot", action.invSlot);
 	C_Container.PickupContainerItem(action.bag, action.slot);
 	if ( not CursorHasItem() ) then
+		DebugEquip("EquipContainerItem failed: no cursor item");
 		return false;
 	end
 	if ( IsInventoryItemLocked(action.invSlot) ) then
+		DebugEquip("EquipContainerItem failed: invSlot locked");
 		return false;
 	end
 	PickupInventoryItem(action.invSlot);
+	DebugEquip("EquipContainerItem ok");
 
 	--EQUIPMENTMANAGER_BAGSLOTS[action.bag][action.slot] = action.invSlot;
 	--EQUIPMENTMANAGER_INVENTORYSLOTS[action.invSlot] = SLOT_LOCKED;
@@ -195,12 +206,14 @@ if EquipmentManager_RunAction and false then
 else
 	function _EquipmentManager_RunAction (action)
 		if ( UnitAffectingCombat("player") and not INVSLOTS_EQUIPABLE_IN_COMBAT[action.invSlot] ) then
+			DebugEquip("RunAction blocked: combat", "invSlot", action.invSlot);
 			return true;
 		end
 
 		--EquipmentManager_UpdateFreeBagSpace();
 
 		action.run = true;
+		DebugEquip("RunAction", "type", action.type, "bags", action.bags, "bag", action.bag, "slot", action.slot, "invSlot", action.invSlot);
 		if ( action.type == EQUIP_ITEM or action.type == SWAP_ITEM ) then
 			if ( not action.bags ) then
 				return EquipmentManager_EquipInventoryItem(action);

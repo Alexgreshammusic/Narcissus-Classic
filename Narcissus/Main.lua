@@ -2210,6 +2210,7 @@ local function NarciDebugEquip(...)
 		print("|cffffc000[Narcissus Equip Debug]|r", ...);
 	end
 end
+_G.NarciDebugEquip = NarciDebugEquip;
 
 function NarciEquipmentFlyoutButtonMixin:OnClick(button, down, isGamepad)
 	if button == "LeftButton" then
@@ -2219,8 +2220,8 @@ function NarciEquipmentFlyoutButtonMixin:OnClick(button, down, isGamepad)
 		if action then
 			self:AnchorAlertFrame();
 			ConfirmBinding();
-			EquipmentManagerAPI.RunAction(action)
-			NarciDebugEquip("RunAction ok");
+			local ok = EquipmentManagerAPI.RunAction(action)
+			NarciDebugEquip("RunAction result", ok);
 			self:Disable();
 		else
 			NarciDebugEquip("Equip failed: nil action");
