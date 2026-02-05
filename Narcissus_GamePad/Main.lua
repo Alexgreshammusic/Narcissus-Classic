@@ -55,12 +55,13 @@ addon.SelectActionGroup = SelectActionGroup;
 
 
 --courtesy of Munk (dev of ConsolePort and Immersion)
-local Proxy = CreateFrame("Button", "NarciPadClickProxy", nil, "InsecureActionButtonTemplate");
+local Proxy = CreateFrame("Button", "NarciPadClickProxy", nil, "SecureActionButtonTemplate");
 addon.ClickProxy = Proxy;
 Proxy:SetAttribute("type", "click");
 
-function Proxy:SetClickTarget(object)
-    SetOverrideBindingClick(Proxy, true, "PAD3", "NarciPadClickProxy");
+function Proxy:SetClickTarget(object, key)
+    key = key or "PAD3";
+    SetOverrideBindingClick(Proxy, true, key, "NarciPadClickProxy");
     self:SetAttribute("type", "click");
     self:SetAttribute("clickbutton", object);
 end
