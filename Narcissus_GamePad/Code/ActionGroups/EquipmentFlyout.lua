@@ -118,11 +118,8 @@ end
 function ag:KeyDown(key)
     if key == "PAD1" then
         if self.currentObj then
-            if addon.ClickProxy and addon.ClickProxy.Click then
-                NarciDebugEquip("PAD1 ClickProxy fire");
-                addon.ClickProxy:Click();
-            end
-            return nil, false;
+            NarciDebugEquip("PAD1 propagate");
+            return nil, true;
         end
     elseif key == "PAD2" then
         self.frame:Hide();
