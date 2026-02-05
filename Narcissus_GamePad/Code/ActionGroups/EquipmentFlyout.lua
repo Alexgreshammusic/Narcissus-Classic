@@ -9,7 +9,13 @@ local SlotBorder = NarciGamePadOverlay.SlotBorder;
 local EquipmentManagerAPI = NarciClassicAPI.EquipmentManager;
 local NARCI_DEBUG_EQUIP = true;
 local function NarciDebugEquip(...)
-    if NARCI_DEBUG_EQUIP then
+    if not NARCI_DEBUG_EQUIP then
+        return;
+    end
+    local message = string.join(" ", tostringall(...));
+    if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+        DEFAULT_CHAT_FRAME:AddMessage("|cffffc000[Narcissus Equip Debug]|r " .. message);
+    else
         print("|cffffc000[Narcissus Equip Debug]|r", ...);
     end
 end
