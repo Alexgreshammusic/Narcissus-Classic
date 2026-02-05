@@ -7,7 +7,7 @@ ag.repeatInterval = 0.25;
 local BUTTONS_PER_ROW = 5;
 local SlotBorder = NarciGamePadOverlay.SlotBorder;
 local EquipmentManagerAPI = NarciClassicAPI.EquipmentManager;
-local NARCI_DEBUG_EQUIP = false;
+local NARCI_DEBUG_EQUIP = true;
 local function NarciDebugEquip(...)
     if NARCI_DEBUG_EQUIP then
         print("|cffffc000[Narcissus Equip Debug]|r", ...);

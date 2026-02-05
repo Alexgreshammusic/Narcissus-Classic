@@ -2198,7 +2198,7 @@ end
 ------------------------------------------------------------------
 
 NarciEquipmentFlyoutButtonMixin = CreateFromMixins{NarciItemButtonSharedMixin};
-local NARCI_DEBUG_EQUIP = false;
+local NARCI_DEBUG_EQUIP = true;
 local function NarciDebugEquip(...)
 	if NARCI_DEBUG_EQUIP then
 		print("|cffffc000[Narcissus Equip Debug]|r", ...);
