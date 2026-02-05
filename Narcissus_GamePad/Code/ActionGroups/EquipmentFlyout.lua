@@ -86,10 +86,16 @@ function ag:Enter(currentObj)
         SlotBorder:AnchorToSlotButton(currentObj);
         currentObj:OnEnter(nil, true);
         local itemID = currentObj.hyperlink and GetItemInfoInstant(currentObj.hyperlink);
+        local _, _, bags, _, slot, bag = EquipmentManagerAPI.UnpackLocation(currentObj.location);
+        self.currentItem = {
+            bags = bags,
+            bag = bag,
+            slot = slot,
+            itemID = itemID,
+        };
         if itemID then
             addon.ClickProxy:SetUseItemID(itemID, "PAD1");
         else
-            local _, _, bags, _, slot, bag = EquipmentManagerAPI.UnpackLocation(currentObj.location);
             if bags then
                 addon.ClickProxy:SetUseBagItem(bag, slot, "PAD1");
             else
@@ -103,6 +109,14 @@ end
 function ag:KeyDown(key)
     if key == "PAD1" then
         if self.currentObj then
+            local useContainerItem = UseContainerItem;
+            if not useContainerItem and C_Container then
+                useContainerItem = C_Container.UseContainerItem;
+            end
+            if useContainerItem and self.currentItem and self.currentItem.bags then
+                useContainerItem(self.currentItem.bag, self.currentItem.slot);
+                return nil, false;
+            end
             return nil, true;
         end
     elseif key == "PAD2" then
