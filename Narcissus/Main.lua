@@ -2222,7 +2222,11 @@ function NarciEquipmentFlyoutButtonMixin:OnClick(button, down, isGamepad)
 			ConfirmBinding();
 			local ok = EquipmentManagerAPI.RunAction(action)
 			NarciDebugEquip("RunAction result", ok);
-			self:Disable();
+			if ok then
+				self:Disable();
+			else
+				NarciDebugEquip("RunAction failed: button left enabled");
+			end
 		else
 			NarciDebugEquip("Equip failed: nil action");
 		end

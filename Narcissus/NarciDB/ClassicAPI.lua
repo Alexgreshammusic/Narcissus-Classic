@@ -157,10 +157,16 @@ end
 local function EquipmentManager_EquipContainerItem (action)
 	ClearCursor();
 	DebugEquip("EquipContainerItem", "bag", action.bag, "slot", action.slot, "invSlot", action.invSlot);
+	DebugEquip("ContainerItemID", C_Container.GetContainerItemID(action.bag, action.slot));
 	C_Container.PickupContainerItem(action.bag, action.slot);
 	if ( not CursorHasItem() ) then
-		DebugEquip("EquipContainerItem failed: no cursor item");
-		return false;
+		DebugEquip("EquipContainerItem failed: no cursor item, attempting UseContainerItem");
+		if C_Container and C_Container.UseContainerItem then
+			C_Container.UseContainerItem(action.bag, action.slot);
+		else
+			UseContainerItem(action.bag, action.slot);
+		end
+		return true;
 	end
 	if ( IsInventoryItemLocked(action.invSlot) ) then
 		DebugEquip("EquipContainerItem failed: invSlot locked");
