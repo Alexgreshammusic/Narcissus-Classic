@@ -85,7 +85,8 @@ local function EquipmentManager_UnpackLocation(location)	--Copied from Retail
 	local player = (bit.band(location, ITEM_INVENTORY_LOCATION_PLAYER) ~= 0);
 	local bank = (bit.band(location, ITEM_INVENTORY_LOCATION_BANK) ~= 0);
 	local bags = (bit.band(location, ITEM_INVENTORY_LOCATION_BAGS) ~= 0);
-	local voidStorage = (bit.band(location, ITEM_INVENTORY_LOCATION_VOIDSTORAGE) ~= 0);
+	local voidStorage = ITEM_INVENTORY_LOCATION_VOIDSTORAGE
+		and (bit.band(location, ITEM_INVENTORY_LOCATION_VOIDSTORAGE) ~= 0);
 	local tab, voidSlot;
 	if ( player ) then
 		location = location - ITEM_INVENTORY_LOCATION_PLAYER;
