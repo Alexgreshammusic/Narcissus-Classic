@@ -2198,15 +2198,26 @@ end
 ------------------------------------------------------------------
 
 NarciEquipmentFlyoutButtonMixin = CreateFromMixins{NarciItemButtonSharedMixin};
+local NARCI_DEBUG_EQUIP = false;
+local function NarciDebugEquip(...)
+	if NARCI_DEBUG_EQUIP then
+		print("|cffffc000[Narcissus Equip Debug]|r", ...);
+	end
+end
 
 function NarciEquipmentFlyoutButtonMixin:OnClick(button, down, isGamepad)
 	if button == "LeftButton" then
+		NarciDebugEquip("Click", "slotID", self.slotID, "location", self.location, "itemLocation", self.itemLocation);
 		local action = EquipmentManagerAPI.EquipItemByLocation(self.location, self.slotID)
+		NarciDebugEquip("EquipItemByLocation action", action);
 		if action then
 			self:AnchorAlertFrame();
 			ConfirmBinding();
 			EquipmentManagerAPI.RunAction(action)
+			NarciDebugEquip("RunAction ok");
 			self:Disable();
+		else
+			NarciDebugEquip("Equip failed: nil action");
 		end
 		if isGamepad then
 			EquipmentFlyoutFrame.gamepadButton = self;

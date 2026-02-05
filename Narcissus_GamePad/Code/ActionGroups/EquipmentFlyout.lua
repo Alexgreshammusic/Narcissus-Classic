@@ -7,6 +7,12 @@ ag.repeatInterval = 0.25;
 local BUTTONS_PER_ROW = 5;
 local SlotBorder = NarciGamePadOverlay.SlotBorder;
 local EquipmentManagerAPI = NarciClassicAPI.EquipmentManager;
+local NARCI_DEBUG_EQUIP = false;
+local function NarciDebugEquip(...)
+    if NARCI_DEBUG_EQUIP then
+        print("|cffffc000[Narcissus Equip Debug]|r", ...);
+    end
+end
 
 function ag:Init()
     self.frame = Narci_EquipmentFlyoutFrame;
@@ -85,6 +91,13 @@ function ag:Enter(currentObj)
     if currentObj and currentObj.OnEnter then
         SlotBorder:AnchorToSlotButton(currentObj);
         currentObj:OnEnter(nil, true);
+        NarciDebugEquip("Enter", "slotID", currentObj.slotID, "location", currentObj.location, "itemLocation", currentObj.itemLocation);
+        if currentObj.location then
+            local _, player, bank, bags, voidStorage, slot, bag = EquipmentManagerAPI.UnpackLocation(currentObj.location);
+            NarciDebugEquip("UnpackLocation", "player", player, "bank", bank, "bags", bags, "void", voidStorage, "bag", bag, "slot", slot);
+        else
+            NarciDebugEquip("UnpackLocation skipped: missing location");
+        end
         addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
     end
     self.currentObj = currentObj;
