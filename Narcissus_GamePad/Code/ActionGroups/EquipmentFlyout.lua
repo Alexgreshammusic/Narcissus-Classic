@@ -85,11 +85,16 @@ function ag:Enter(currentObj)
     if currentObj and currentObj.OnEnter then
         SlotBorder:AnchorToSlotButton(currentObj);
         currentObj:OnEnter(nil, true);
-        local _, _, bags, _, slot, bag = EquipmentManagerAPI.UnpackLocation(currentObj.location);
-        if bags then
-            addon.ClickProxy:SetUseBagItem(bag, slot, "PAD1");
+        local itemID = currentObj.hyperlink and GetItemInfoInstant(currentObj.hyperlink);
+        if itemID then
+            addon.ClickProxy:SetUseItemID(itemID, "PAD1");
         else
-            addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
+            local _, _, bags, _, slot, bag = EquipmentManagerAPI.UnpackLocation(currentObj.location);
+            if bags then
+                addon.ClickProxy:SetUseBagItem(bag, slot, "PAD1");
+            else
+                addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
+            end
         end
     end
     self.currentObj = currentObj;

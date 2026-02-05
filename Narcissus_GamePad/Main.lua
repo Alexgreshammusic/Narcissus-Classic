@@ -83,6 +83,17 @@ function Proxy:SetUseBagItem(bag, slot, key)
     self:SetAttribute("macrotext", string.format("/use %d %d", bag, slot));
 end
 
+function Proxy:SetUseItemID(itemID, key)
+    key = key or "PAD1";
+    if not itemID then
+        self:Remove();
+        return
+    end
+    SetOverrideBindingClick(Proxy, true, key, "NarciPadClickProxy");
+    self:SetAttribute("type", "macro");
+    self:SetAttribute("macrotext", string.format("/use item:%d", itemID));
+end
+
 function Proxy:SetRunMacro(macroText)
     if macroText then
         SetOverrideBindingClick(Proxy, true, "PAD3", "NarciPadClickProxy");
