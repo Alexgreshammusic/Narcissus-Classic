@@ -90,8 +90,8 @@ function Proxy:SetUseItemID(itemID, key)
         return
     end
     SetOverrideBindingClick(Proxy, true, key, "NarciPadClickProxy");
-    self:SetAttribute("type", "macro");
-    self:SetAttribute("macrotext", string.format("/use item:%d", itemID));
+    self:SetAttribute("type", "item");
+    self:SetAttribute("item", string.format("item:%d", itemID));
 end
 
 function Proxy:SetRunMacro(macroText)
