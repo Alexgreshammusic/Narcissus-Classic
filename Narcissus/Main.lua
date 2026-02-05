@@ -2206,8 +2206,8 @@ function NarciEquipmentFlyoutButtonMixin:OnClick(button, down, isGamepad)
 			self:AnchorAlertFrame();
 			ConfirmBinding();
 			EquipmentManagerAPI.RunAction(action)
+			self:Disable();
 		end
-		self:Disable();
 		if isGamepad then
 			EquipmentFlyoutFrame.gamepadButton = self;
 		end
