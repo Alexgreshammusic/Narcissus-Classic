@@ -85,6 +85,7 @@ function ag:Enter(currentObj)
     if currentObj and currentObj.OnEnter then
         SlotBorder:AnchorToSlotButton(currentObj);
         currentObj:OnEnter(nil, true);
+        addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
     end
     self.currentObj = currentObj;
 end
@@ -92,8 +93,7 @@ end
 function ag:KeyDown(key)
     if key == "PAD1" then
         if self.currentObj then
-            self.currentObj:Click();
-            return nil, false;
+            return nil, true;
         end
     elseif key == "PAD2" then
         self.frame:Hide();
