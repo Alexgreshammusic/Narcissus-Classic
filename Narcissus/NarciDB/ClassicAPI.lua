@@ -162,7 +162,20 @@ local function EquipmentManager_EquipContainerItem (action)
 	local bagItemID = C_Container.GetContainerItemID(action.bag, action.slot);
 	local invItemID = GetInventoryItemID("player", action.invSlot);
 	DebugEquip("ContainerItemID", bagItemID, "InvItemID", invItemID);
+	if C_Container and C_Container.GetContainerItemInfo then
+		local info = C_Container.GetContainerItemInfo(action.bag, action.slot);
+		if info then
+			DebugEquip("ContainerItemInfo", "locked", info.isLocked, "hasLoot", info.hasLoot, "itemID", info.itemID, "quality", info.quality);
+		else
+			DebugEquip("ContainerItemInfo missing");
+		end
+	end
+	if C_Item and C_Item.IsLocked then
+		local itemLocation = ItemLocation:CreateFromBagAndSlot(action.bag, action.slot);
+		DebugEquip("ContainerItemLocation locked", C_Item.IsLocked(itemLocation));
+	end
 	C_Container.PickupContainerItem(action.bag, action.slot);
+	DebugEquip("CursorHasItem after pickup", CursorHasItem());
 	if ( not CursorHasItem() ) then
 		DebugEquip("EquipContainerItem failed: no cursor item, attempting UseContainerItem");
 		if C_Container and C_Container.UseContainerItem then
