@@ -162,6 +162,15 @@ local function EquipmentManager_EquipContainerItem (action)
 	local bagItemID = C_Container.GetContainerItemID(action.bag, action.slot);
 	local invItemID = GetInventoryItemID("player", action.invSlot);
 	DebugEquip("ContainerItemID", bagItemID, "InvItemID", invItemID);
+	if ConsolePort and bagItemID and EquipItemByName then
+		DebugEquip("ConsolePort equip: EquipItemByName pre-pickup", "itemID", bagItemID, "invSlot", action.invSlot);
+		EquipItemByName(bagItemID, action.invSlot);
+		local newInvItemID = GetInventoryItemID("player", action.invSlot);
+		DebugEquip("ConsolePort equip result", "newInvItemID", newInvItemID);
+		if (bagItemID == newInvItemID) or (invItemID ~= newInvItemID) then
+			return true;
+		end
+	end
 	if C_Container and C_Container.GetContainerItemInfo then
 		local info = C_Container.GetContainerItemInfo(action.bag, action.slot);
 		if info then
