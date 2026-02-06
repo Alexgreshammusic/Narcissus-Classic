@@ -2198,37 +2198,17 @@ end
 ------------------------------------------------------------------
 
 NarciEquipmentFlyoutButtonMixin = CreateFromMixins{NarciItemButtonSharedMixin};
-local NARCI_DEBUG_EQUIP = true;
-local function NarciDebugEquip(...)
-	if not NARCI_DEBUG_EQUIP then
-		return;
-	end
-	local message = string.join(" ", tostringall(...));
-	if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffffc000[Narcissus Equip Debug]|r " .. message);
-	else
-		print("|cffffc000[Narcissus Equip Debug]|r", ...);
-	end
-end
-_G.NarciDebugEquip = NarciDebugEquip;
 
 function NarciEquipmentFlyoutButtonMixin:OnClick(button, down, isGamepad)
 	if button == "LeftButton" then
-		NarciDebugEquip("Click", "slotID", self.slotID, "location", self.location, "itemLocation", self.itemLocation);
 		local action = EquipmentManagerAPI.EquipItemByLocation(self.location, self.slotID)
-		NarciDebugEquip("EquipItemByLocation action", action);
 		if action then
 			self:AnchorAlertFrame();
 			ConfirmBinding();
 			local ok = EquipmentManagerAPI.RunAction(action)
-			NarciDebugEquip("RunAction result", ok);
 			if ok then
 				self:Disable();
-			else
-				NarciDebugEquip("RunAction failed: button left enabled");
 			end
-		else
-			NarciDebugEquip("Equip failed: nil action");
 		end
 		if isGamepad then
 			EquipmentFlyoutFrame.gamepadButton = self;
@@ -2447,12 +2427,6 @@ function NarciEquipmentFlyoutFrameMixin:CreateItemButton()
 
 	local button = CreateFrame("Button", nil, self.ButtonFrame, "NarciEquipmentFlyoutButtonTemplate");
 	button:SetFrameStrata("DIALOG");
-	button:HookScript("OnClick", function(frame, buttonName, down)
-		NarciDebugEquip("Hooked OnClick", "button", buttonName, "down", down, "slotID", frame.slotID, "location", frame.location, "itemLocation", frame.itemLocation);
-	end);
-	button:HookScript("OnEnter", function(frame)
-		NarciDebugEquip("Hooked OnEnter", "slotID", frame.slotID, "location", frame.location, "itemLocation", frame.itemLocation);
-	end);
 	local row = floor(numButtons/perRow);
 	local col = numButtons - row * perRow;
 	button:SetPoint("TOPLEFT", self, "TOPLEFT", 70*col, -74*row);

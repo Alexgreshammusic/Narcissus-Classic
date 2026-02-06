@@ -77,12 +77,6 @@ local EQUIP_ITEM = 1;
 local UNEQUIP_ITEM = 2;
 local SWAP_ITEM = 3;
 
-local function DebugEquip(...)
-	if _G.NarciDebugEquip then
-		_G.NarciDebugEquip(...);
-	end
-end
-
 local function EquipmentManager_UnpackLocation(location)	--Copied from Retail
 	if ( location < 0 ) then
 		return false, false, false, 0;
@@ -138,7 +132,6 @@ local function EquipmentManager_EquipItemByLocation (location, invSlot)
 	action.bags = bags;
 	action.slot = slot;
 	action.bag = bag;
-	DebugEquip("EquipAction", "type", action.type, "invSlot", action.invSlot, "bags", action.bags, "bag", action.bag, "slot", action.slot, "player", action.player, "bank", action.bank);
 
 	return action;
 end
@@ -158,64 +151,44 @@ end
 
 local function EquipmentManager_EquipContainerItem (action)
 	ClearCursor();
-	DebugEquip("EquipContainerItem", "bag", action.bag, "slot", action.slot, "invSlot", action.invSlot);
 	local bagItemID = C_Container.GetContainerItemID(action.bag, action.slot);
 	local invItemID = GetInventoryItemID("player", action.invSlot);
-	DebugEquip("ContainerItemID", bagItemID, "InvItemID", invItemID);
 	if ConsolePort and bagItemID and EquipItemByName then
-		DebugEquip("ConsolePort equip: EquipItemByName pre-pickup", "itemID", bagItemID, "invSlot", action.invSlot);
 		EquipItemByName(bagItemID, action.invSlot);
 		local newInvItemID = GetInventoryItemID("player", action.invSlot);
-		DebugEquip("ConsolePort equip result", "newInvItemID", newInvItemID);
 		if (bagItemID == newInvItemID) or (invItemID ~= newInvItemID) then
 			return true;
-		end
-	end
-	if C_Container and C_Container.GetContainerItemInfo then
-		local info = C_Container.GetContainerItemInfo(action.bag, action.slot);
-		if info then
-			DebugEquip("ContainerItemInfo", "locked", info.isLocked, "hasLoot", info.hasLoot, "itemID", info.itemID, "quality", info.quality);
-		else
-			DebugEquip("ContainerItemInfo missing");
 		end
 	end
 	if C_Item and C_Item.IsLocked then
 		local itemLocation = ItemLocation:CreateFromBagAndSlot(action.bag, action.slot);
 		local isLocked = C_Item.IsLocked(itemLocation);
-		DebugEquip("ContainerItemLocation locked", isLocked);
 		if isLocked and C_Item.UnlockItem then
 			C_Item.UnlockItem(itemLocation);
-			DebugEquip("ContainerItemLocation unlock attempted");
 		end
 	end
 	C_Container.PickupContainerItem(action.bag, action.slot);
-	DebugEquip("CursorHasItem after pickup", CursorHasItem());
 	if ( not CursorHasItem() ) then
-		DebugEquip("EquipContainerItem failed: no cursor item, attempting UseContainerItem");
 		if C_Container and C_Container.UseContainerItem then
 			C_Container.UseContainerItem(action.bag, action.slot);
 		else
 			UseContainerItem(action.bag, action.slot);
 		end
 		local newInvItemID = GetInventoryItemID("player", action.invSlot);
-		DebugEquip("UseContainerItem result", "newInvItemID", newInvItemID);
 		if (bagItemID and newInvItemID == bagItemID) or (invItemID ~= newInvItemID) then
 			return true;
 		end
 		if bagItemID and EquipItemByName then
 			EquipItemByName(bagItemID, action.invSlot);
 			newInvItemID = GetInventoryItemID("player", action.invSlot);
-			DebugEquip("EquipItemByName result", "newInvItemID", newInvItemID);
 			return (bagItemID == newInvItemID) or (invItemID ~= newInvItemID);
 		end
 		return false;
 	end
 	if ( IsInventoryItemLocked(action.invSlot) ) then
-		DebugEquip("EquipContainerItem failed: invSlot locked");
 		return false;
 	end
 	PickupInventoryItem(action.invSlot);
-	DebugEquip("EquipContainerItem ok");
 
 	--EQUIPMENTMANAGER_BAGSLOTS[action.bag][action.slot] = action.invSlot;
 	--EQUIPMENTMANAGER_INVENTORYSLOTS[action.invSlot] = SLOT_LOCKED;
@@ -254,14 +227,12 @@ if EquipmentManager_RunAction and false then
 else
 	function _EquipmentManager_RunAction (action)
 		if ( UnitAffectingCombat("player") and not INVSLOTS_EQUIPABLE_IN_COMBAT[action.invSlot] ) then
-			DebugEquip("RunAction blocked: combat", "invSlot", action.invSlot);
 			return true;
 		end
 
 		--EquipmentManager_UpdateFreeBagSpace();
 
 		action.run = true;
-		DebugEquip("RunAction", "type", action.type, "bags", action.bags, "bag", action.bag, "slot", action.slot, "invSlot", action.invSlot);
 		if ( action.type == EQUIP_ITEM or action.type == SWAP_ITEM ) then
 			if ( not action.bags ) then
 				return EquipmentManager_EquipInventoryItem(action);

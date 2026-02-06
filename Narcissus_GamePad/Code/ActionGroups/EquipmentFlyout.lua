@@ -7,18 +7,6 @@ ag.repeatInterval = 0.25;
 local BUTTONS_PER_ROW = 5;
 local SlotBorder = NarciGamePadOverlay.SlotBorder;
 local EquipmentManagerAPI = NarciClassicAPI.EquipmentManager;
-local NARCI_DEBUG_EQUIP = true;
-local function NarciDebugEquip(...)
-    if not NARCI_DEBUG_EQUIP then
-        return;
-    end
-    local message = string.join(" ", tostringall(...));
-    if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
-        DEFAULT_CHAT_FRAME:AddMessage("|cffffc000[Narcissus Equip Debug]|r " .. message);
-    else
-        print("|cffffc000[Narcissus Equip Debug]|r", ...);
-    end
-end
 
 function ag:Init()
     self.frame = Narci_EquipmentFlyoutFrame;
@@ -97,14 +85,6 @@ function ag:Enter(currentObj)
     if currentObj and currentObj.OnEnter then
         SlotBorder:AnchorToSlotButton(currentObj);
         currentObj:OnEnter(nil, true);
-        NarciDebugEquip("Enter", "slotID", currentObj.slotID, "location", currentObj.location, "itemLocation", currentObj.itemLocation);
-        if currentObj.location then
-            local player, bank, bags, voidStorage, slot, bag = EquipmentManagerAPI.UnpackLocation(currentObj.location);
-            NarciDebugEquip("UnpackLocation", "player", player, "bank", bank, "bags", bags, "void", voidStorage, "bag", bag, "slot", slot);
-        else
-            NarciDebugEquip("UnpackLocation skipped: missing location");
-        end
-        NarciDebugEquip("Bind PAD1 ClickTarget");
         addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
     end
     self.currentObj = currentObj;
@@ -113,14 +93,9 @@ end
 function ag:KeyDown(key)
     if key == "PAD1" then
         if self.currentObj then
-            NarciDebugEquip("PAD1 EquipItemByLocation");
             local action = EquipmentManagerAPI.EquipItemByLocation(self.currentObj.location, self.currentObj.slotID);
-            NarciDebugEquip("PAD1 EquipItemByLocation action", action);
             if action then
-                local ok = EquipmentManagerAPI.RunAction(action);
-                NarciDebugEquip("PAD1 RunAction result", ok);
-            else
-                NarciDebugEquip("PAD1 Equip failed: nil action");
+                EquipmentManagerAPI.RunAction(action);
             end
             return nil, true;
         end
