@@ -172,7 +172,12 @@ local function EquipmentManager_EquipContainerItem (action)
 	end
 	if C_Item and C_Item.IsLocked then
 		local itemLocation = ItemLocation:CreateFromBagAndSlot(action.bag, action.slot);
-		DebugEquip("ContainerItemLocation locked", C_Item.IsLocked(itemLocation));
+		local isLocked = C_Item.IsLocked(itemLocation);
+		DebugEquip("ContainerItemLocation locked", isLocked);
+		if isLocked and C_Item.UnlockItem then
+			C_Item.UnlockItem(itemLocation);
+			DebugEquip("ContainerItemLocation unlock attempted");
+		end
 	end
 	C_Container.PickupContainerItem(action.bag, action.slot);
 	DebugEquip("CursorHasItem after pickup", CursorHasItem());
@@ -185,7 +190,16 @@ local function EquipmentManager_EquipContainerItem (action)
 		end
 		local newInvItemID = GetInventoryItemID("player", action.invSlot);
 		DebugEquip("UseContainerItem result", "newInvItemID", newInvItemID);
-		return (bagItemID and newInvItemID == bagItemID) or (invItemID ~= newInvItemID);
+		if (bagItemID and newInvItemID == bagItemID) or (invItemID ~= newInvItemID) then
+			return true;
+		end
+		if bagItemID and EquipItemByName then
+			EquipItemByName(bagItemID, action.invSlot);
+			newInvItemID = GetInventoryItemID("player", action.invSlot);
+			DebugEquip("EquipItemByName result", "newInvItemID", newInvItemID);
+			return (bagItemID == newInvItemID) or (invItemID ~= newInvItemID);
+		end
+		return false;
 	end
 	if ( IsInventoryItemLocked(action.invSlot) ) then
 		DebugEquip("EquipContainerItem failed: invSlot locked");
