@@ -113,11 +113,16 @@ end
 function ag:KeyDown(key)
     if key == "PAD1" then
         if self.currentObj then
-            if addon.ClickProxy and addon.ClickProxy.Click then
-                NarciDebugEquip("PAD1 ClickProxy fire");
-                addon.ClickProxy:Click();
+            NarciDebugEquip("PAD1 EquipItemByLocation");
+            local action = EquipmentManagerAPI.EquipItemByLocation(self.currentObj.location, self.currentObj.slotID);
+            NarciDebugEquip("PAD1 EquipItemByLocation action", action);
+            if action then
+                local ok = EquipmentManagerAPI.RunAction(action);
+                NarciDebugEquip("PAD1 RunAction result", ok);
+            else
+                NarciDebugEquip("PAD1 Equip failed: nil action");
             end
-            return nil, false;
+            return nil, true;
         end
     elseif key == "PAD2" then
         self.frame:Hide();
