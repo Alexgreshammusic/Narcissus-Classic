@@ -6,6 +6,7 @@ ag.repeatInterval = 0.25;
 
 local BUTTONS_PER_ROW = 5;
 local SlotBorder = NarciGamePadOverlay.SlotBorder;
+local EquipmentManagerAPI = NarciClassicAPI.EquipmentManager;
 
 function ag:Init()
     self.frame = Narci_EquipmentFlyoutFrame;
@@ -84,6 +85,7 @@ function ag:Enter(currentObj)
     if currentObj and currentObj.OnEnter then
         SlotBorder:AnchorToSlotButton(currentObj);
         currentObj:OnEnter(nil, true);
+        addon.ClickProxy:SetClickTarget(currentObj, "PAD1");
     end
     self.currentObj = currentObj;
 end
@@ -91,9 +93,17 @@ end
 function ag:KeyDown(key)
     if key == "PAD1" then
         if self.currentObj then
-            self.currentObj:Click();
+            local action = EquipmentManagerAPI.EquipItemByLocation(self.currentObj.location, self.currentObj.slotID);
+            if action then
+                EquipmentManagerAPI.RunAction(action);
+            end
+            return nil, true;
         end
     elseif key == "PAD2" then
         self.frame:Hide();
     end
+end
+
+function ag:OnDeactive()
+    addon.ClickProxy:Remove();
 end

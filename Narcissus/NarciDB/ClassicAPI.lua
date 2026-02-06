@@ -85,7 +85,10 @@ local function EquipmentManager_UnpackLocation(location)	--Copied from Retail
 	local player = (bit.band(location, ITEM_INVENTORY_LOCATION_PLAYER) ~= 0);
 	local bank = (bit.band(location, ITEM_INVENTORY_LOCATION_BANK) ~= 0);
 	local bags = (bit.band(location, ITEM_INVENTORY_LOCATION_BAGS) ~= 0);
-	local voidStorage = (bit.band(location, ITEM_INVENTORY_LOCATION_VOIDSTORAGE) ~= 0);
+	local voidStorage = false;
+	if ITEM_INVENTORY_LOCATION_VOIDSTORAGE then
+		voidStorage = (bit.band(location, ITEM_INVENTORY_LOCATION_VOIDSTORAGE) ~= 0);
+	end
 	local tab, voidSlot;
 	if ( player ) then
 		location = location - ITEM_INVENTORY_LOCATION_PLAYER;
@@ -148,8 +151,38 @@ end
 
 local function EquipmentManager_EquipContainerItem (action)
 	ClearCursor();
+	local bagItemID = C_Container.GetContainerItemID(action.bag, action.slot);
+	local invItemID = GetInventoryItemID("player", action.invSlot);
+	if ConsolePort and bagItemID and EquipItemByName then
+		EquipItemByName(bagItemID, action.invSlot);
+		local newInvItemID = GetInventoryItemID("player", action.invSlot);
+		if (bagItemID == newInvItemID) or (invItemID ~= newInvItemID) then
+			return true;
+		end
+	end
+	if C_Item and C_Item.IsLocked then
+		local itemLocation = ItemLocation:CreateFromBagAndSlot(action.bag, action.slot);
+		local isLocked = C_Item.IsLocked(itemLocation);
+		if isLocked and C_Item.UnlockItem then
+			C_Item.UnlockItem(itemLocation);
+		end
+	end
 	C_Container.PickupContainerItem(action.bag, action.slot);
 	if ( not CursorHasItem() ) then
+		if C_Container and C_Container.UseContainerItem then
+			C_Container.UseContainerItem(action.bag, action.slot);
+		else
+			UseContainerItem(action.bag, action.slot);
+		end
+		local newInvItemID = GetInventoryItemID("player", action.invSlot);
+		if (bagItemID and newInvItemID == bagItemID) or (invItemID ~= newInvItemID) then
+			return true;
+		end
+		if bagItemID and EquipItemByName then
+			EquipItemByName(bagItemID, action.invSlot);
+			newInvItemID = GetInventoryItemID("player", action.invSlot);
+			return (bagItemID == newInvItemID) or (invItemID ~= newInvItemID);
+		end
 		return false;
 	end
 	if ( IsInventoryItemLocked(action.invSlot) ) then
